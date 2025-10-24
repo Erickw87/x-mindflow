@@ -36,9 +36,21 @@
 
 统一的抽象层设计,屏蔽底层环境差异:
 
-- 支持 Kubernetes 集群环境
-- 支持裸金属(BareMetal)服务器环境
+**Kubernetes 环境**:
+- 支持 Deployment 无状态服务部署
+- 支持 StatefulSet 有状态服务部署
+- 通过 Service/Ingress 实现流量控制
+- 完整的容器化部署能力
+
+**裸金属(BareMetal)环境**:
+- 支持进程级应用部署
+- 通过 Agent + Registry + Edge Proxy 实现统一管理
+- 基于 Supervisor 的进程守护
+- **限制**: 仅支持无状态服务,不支持 StatefulSet
+
+**环境抽象**:
 - 通过适配器模式接入不同环境
+- 统一的 EnvironmentAdapter 接口定义
 - 为未来多集群部署预留扩展性
 
 ### 5. 健康检查
@@ -102,6 +114,7 @@
 
 - 仅支持单集群部署(多集群支持将在后续版本提供)
 - 发布状态机细节待进一步完善
+- BareMetal 环境仅支持无状态服务部署
 
 ### 安全限制
 
@@ -112,4 +125,6 @@
 
 - 主需求 Issue: [#3 智能发布系统](https://github.com/LiusCraft/x-mindflow/issues/3)
 - 本需求 Issue: [#7 统一发布抽象层设计](https://github.com/LiusCraft/x-mindflow/issues/7)
+- 环境适配层 Issue: [#8 环境适配层设计](https://github.com/LiusCraft/x-mindflow/issues/8)
 - 技术实现文档: [7-deployment-abstraction-layer-technical.md](./7-deployment-abstraction-layer-technical.md)
+- 环境适配层详细设计: [8-environment-adapter-detail.md](./8-environment-adapter-detail.md)
