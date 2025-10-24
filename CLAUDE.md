@@ -2,7 +2,17 @@
 
 ## 📌 项目概述
 
-**x-mindflow** 是一个企业级思维导图与知识流动管理平台，采用前后端分离架构。
+**x-mindflow** 是一个企业级智能发布系统，支持多版本并行部署、统一多环境管理和自动化故障回滚，采用前后端分离架构。
+
+### 产品定位
+
+通过**逻辑-物理分离**的架构设计，实现面向状态的渐进式发布，以**负载均衡器(LB)为核心**的流量控制机制，提供统一的发布体验，无论是 Kubernetes 还是物理机环境。
+
+**核心设计原则**：
+- 逻辑与物理分离 - 统一抽象层 + 环境适配器
+- 面向状态的发布 - 声明式配置驱动
+- 以 LB 为核心的流量控制 - 拓扑即配置
+- 最小化功能集 - 避免重复造轮，复用现有组件
 
 ### 技术栈
 
@@ -190,7 +200,7 @@ Fixes #456
 ```
 
 **示例**:
-- `feat(mindmap): add collaborative editing feature`
+- `feat(deploy): add multi-version parallel deployment feature`
 - `fix(auth): resolve session timeout issue`
 
 #### PR 描述模板
@@ -245,8 +255,8 @@ Closes #<issue-number>
 - `文档`
 
 **示例**:
-- `[需求分析] 用户协作编辑功能需求分析`
-- `[原型设计] 思维导图编辑器界面原型`
+- `[需求分析] 多版本并行发布功能需求分析`
+- `[原型设计] 发布拓扑可视化界面原型`
 - `[Bug] 登录后 Token 未正确存储`
 
 #### Issue 必填项
@@ -678,12 +688,12 @@ func SetupRouter(r *gin.Engine) {
             users.DELETE("/:id", handler.DeleteUser)
         }
         
-        // 思维导图相关
-        mindmaps := v1.Group("/mindmaps")
-        mindmaps.Use(middleware.Auth()) // 认证中间件
+        // 发布部署相关
+        deployments := v1.Group("/deployments")
+        deployments.Use(middleware.Auth()) // 认证中间件
         {
-            mindmaps.GET("", handler.ListMindmaps)
-            mindmaps.POST("", handler.CreateMindmap)
+            deployments.GET("", handler.ListDeployments)
+            deployments.POST("", handler.CreateDeployment)
         }
     }
 }
@@ -736,7 +746,7 @@ type User struct {
     Password string `gorm:"not null" json:"-"` // 不返回密码
     
     // 关联
-    Mindmaps []Mindmap `gorm:"foreignKey:UserID" json:"mindmaps,omitempty"`
+    Deployments []Deployment `gorm:"foreignKey:UserID" json:"deployments,omitempty"`
 }
 
 // TableName 自定义表名
@@ -1100,7 +1110,7 @@ npm update
 **给 AI 的核心指令**:
 
 ```
-你是 x-mindflow 项目的开发助手，必须严格遵守以下规则：
+你是 x-mindflow 项目（企业级智能发布系统）的开发助手，必须严格遵守以下规则：
 
 1. 开发流程：
    - 必须先阅读 /docs 下的对应设计文档
