@@ -528,9 +528,21 @@ Service A (v2) ──┘                    └──→ Service C (v2)
 - Service B 是否需要感知上游版本？
 - 如何确保 Service A v2 的流量最终到达 Service C v2？
 
-**候选方案**：
-- 方案 A：Service B 透传路由标签，Service C LB 根据标签路由
-- 方案 B：Service B 也拆分为两个版本（增加复杂度）
+**✅ 采用方案 A**：Service B 透传路由标签，Service C LB 根据标签路由
+
+**实现细节**：
+- **路由标签指定时机**：在创建发布计划时指定
+  - 本次发布的版本默认走**线上稳定路由**（production/default route）
+  - 如果有关联服务一起发布，需要在发布计划中明确指定关联服务的路由标签
+- **透传机制**：
+  - Service B 通过透传框架自动转发 `X-LB-Route-ID` header
+  - Service C 的 LB 根据接收到的路由标签进行流量路由
+  - 无需 Service B 感知或处理路由逻辑
+
+**方案对比**：
+- ~~方案 B：Service B 也拆分为两个版本~~（增加复杂度，不采用）
+  - 缺点：每个中间服务都需要版本拆分，运维成本高
+  - 缺点：无法应对动态变化的服务依赖关系
 
 ### 3. LB 配置如何与 GitOps 集成
 
