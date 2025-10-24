@@ -1,0 +1,24 @@
+# 文档目录
+
+本目录存放项目各阶段的设计文档。
+
+## 目录说明
+
+- `requirements/` - 需求分析文档
+- `prototypes/` - 原型设计文档
+- `api/` - API 设计文档
+- `database/` - 数据库设计文档
+- `architecture/` - 架构设计文档
+- `modules/` - 模块设计文档
+- `development/` - 开发指南
+
+## 文档命名规范
+
+```
+<issue-number>-<类型>-<简短描述>.md
+```
+
+示例：
+- `123-requirement-user-auth.md`
+- `124-prototype-mindmap-editor.md`
+- `125-api-user-management.md`
