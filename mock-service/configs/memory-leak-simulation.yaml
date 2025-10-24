@@ -1,0 +1,39 @@
+service:
+  name: memory-leak-service
+  version: v1.0.0
+  port: 8086
+
+behaviors:
+  memory:
+    enabled: true
+    target_mb: 500
+    duration: 5m
+    trigger:
+      type: endpoint
+      endpoint: /api/trigger-memory
+
+observability:
+  health_check:
+    enabled: true
+    path: /health
+  logging:
+    level: info
+    format: json
+
+endpoints:
+  - path: /api/status
+    method: GET
+    response:
+      status: 200
+      body:
+        message: "Service running normally"
+        timestamp: "{{.Timestamp}}"
+
+  - path: /api/trigger-memory
+    method: POST
+    response:
+      status: 202
+      body:
+        message: "Memory load triggered (500MB for 5 minutes)"
+        target_mb: 500
+        duration: "5m"

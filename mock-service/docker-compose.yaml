@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  user-service-v1-1:
+    build: .
+    container_name: mock-user-service-v1-1
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./configs:/app/configs:ro
+    command: ["--config", "/app/configs/user-service-v1.1.yaml"]
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+  user-service-v1-2:
+    build: .
+    container_name: mock-user-service-v1-2
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./configs:/app/configs:ro
+    command: ["--config", "/app/configs/user-service-v1.2.yaml"]
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+  order-service:
+    build: .
+    container_name: mock-order-service
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./configs:/app/configs:ro
+    command: ["--config", "/app/configs/chain-proxy-example.yaml", "--port", "8080"]
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped

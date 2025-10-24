@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mock-user-service-v1-1-config
+data:
+  config.yaml: |
+    service:
+      name: "user-service"
+      version: "v1.1.0"
+      port: 8080
+
+    behaviors:
+      cpu:
+        enabled: false
+      memory:
+        enabled: false
+      startup:
+        fail: false
+      crash:
+        enabled: false
+
+    endpoints:
+      - path: "/health"
+        method: "GET"
+        response:
+          status: 200
+          body:
+            status: "healthy"
+            version: "v1.1.0"
+
+      - path: "/api/v1/users/:id"
+        method: "GET"
+        response:
+          status: 200
+          body:
+            id: "{{.PathParam.id}}"
+            name: "User {{.PathParam.id}}"
+            email: "user{{.PathParam.id}}@example.com"
+
+    observability:
+      health_check:
+        enabled: true
+        port: 8080
+        path: "/health"
+      logging:
+        level: "info"
+        format: "json"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mock-user-service-v1-2-config
+data:
+  config.yaml: |
+    service:
+      name: "user-service"
+      version: "v1.2.0"
+      port: 8080
+
+    behaviors:
+      cpu:
+        enabled: true
+        target_percent: 80
+        trigger:
+          type: "startup"
+        duration: 600s
+      memory:
+        enabled: false
+      startup:
+        fail: false
+      crash:
+        enabled: false
+
+    endpoints:
+      - path: "/health"
+        method: "GET"
+        response:
+          status: 200
+          body:
+            status: "healthy"
+            version: "v1.2.0"
+
+      - path: "/api/v1/users/:id"
+        method: "GET"
+        response:
+          status: 200
+          body:
+            id: "{{.PathParam.id}}"
+            name: "User {{.PathParam.id}}"
+
+    observability:
+      health_check:
+        enabled: true
+        port: 8080
+        path: "/health"
+      logging:
+        level: "info"
+        format: "json"

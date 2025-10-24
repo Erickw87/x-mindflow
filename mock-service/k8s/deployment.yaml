@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-user-service-v1-1
+  labels:
+    app: mock-user-service
+    version: v1.1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mock-user-service
+      version: v1.1.0
+  template:
+    metadata:
+      labels:
+        app: mock-user-service
+        version: v1.1.0
+    spec:
+      containers:
+      - name: mock-server
+        image: mock-service:v1.0.0
+        args:
+          - "--config"
+          - "/app/configs/config.yaml"
+          - "--log-level"
+          - "info"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /app/configs
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: config
+        configMap:
+          name: mock-user-service-v1-1-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-user-service-v1-2
+  labels:
+    app: mock-user-service
+    version: v1.2.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mock-user-service
+      version: v1.2.0
+  template:
+    metadata:
+      labels:
+        app: mock-user-service
+        version: v1.2.0
+    spec:
+      containers:
+      - name: mock-server
+        image: mock-service:v1.0.0
+        args:
+          - "--config"
+          - "/app/configs/config.yaml"
+          - "--log-level"
+          - "info"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /app/configs
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: config
+        configMap:
+          name: mock-user-service-v1-2-config

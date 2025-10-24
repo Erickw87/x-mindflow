@@ -1,0 +1,61 @@
+service:
+  name: "user-service"
+  version: "v1.1.0"
+  port: 8081
+
+behaviors:
+  cpu:
+    enabled: false
+  memory:
+    enabled: false
+  startup:
+    fail: false
+    delay: 0s
+  crash:
+    enabled: false
+
+endpoints:
+  - path: "/health"
+    method: "GET"
+    response:
+      status: 200
+      body:
+        status: "healthy"
+        version: "v1.1.0"
+    latency: 10ms
+
+  - path: "/api/v1/users/:id"
+    method: "GET"
+    response:
+      status: 200
+      body:
+        id: "{{.PathParam.id}}"
+        name: "User {{.PathParam.id}}"
+        email: "user{{.PathParam.id}}@example.com"
+        version: "{{.Service.Version}}"
+        created_at: "{{.Timestamp}}"
+    latency: 50ms
+
+  - path: "/api/v1/users"
+    method: "GET"
+    response:
+      status: 200
+      body:
+        users:
+          - id: "1"
+            name: "Alice"
+          - id: "2"
+            name: "Bob"
+        page: "{{.QueryParam.page}}"
+        limit: "{{.QueryParam.limit}}"
+    latency: 100ms
+
+observability:
+  health_check:
+    enabled: true
+    port: 8081
+    path: "/health"
+  logging:
+    level: "info"
+    format: "json"
+    output: "stdout"

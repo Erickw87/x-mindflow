@@ -1,0 +1,38 @@
+service:
+  name: crash-test-service
+  version: v1.0.0
+  port: 8085
+
+behaviors:
+  crash:
+    enabled: true
+    trigger:
+      type: endpoint
+      endpoint: /api/trigger-crash
+    delay: 1s
+
+observability:
+  health_check:
+    enabled: true
+    path: /health
+  logging:
+    level: warn
+    format: json
+
+endpoints:
+  - path: /api/status
+    method: GET
+    response:
+      status: 200
+      body:
+        status: "running"
+        service: "{{.Service.Name}}"
+        version: "{{.Service.Version}}"
+
+  - path: /api/trigger-crash
+    method: POST
+    response:
+      status: 202
+      body:
+        message: "Crash scheduled in 1 second"
+        timestamp: "{{.Timestamp}}"

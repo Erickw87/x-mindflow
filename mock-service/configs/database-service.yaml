@@ -1,0 +1,74 @@
+service:
+  name: database-service
+  version: v2.0.0
+  port: 8084
+
+observability:
+  health_check:
+    enabled: true
+    path: /health
+  logging:
+    level: info
+    format: json
+
+endpoints:
+  - path: /api/users
+    method: GET
+    response:
+      status: 200
+      headers:
+        Content-Type: application/json
+      body:
+        users:
+          - id: "1"
+            name: "Alice"
+            email: "alice@example.com"
+          - id: "2"
+            name: "Bob"
+            email: "bob@example.com"
+        count: 2
+        timestamp: "{{.Timestamp}}"
+
+  - path: /api/users/:id
+    method: GET
+    response:
+      status: 200
+      body:
+        id: "{{.PathParam.id}}"
+        name: "User {{.PathParam.id}}"
+        email: "user{{.PathParam.id}}@example.com"
+        created_at: "{{.Timestamp}}"
+
+  - path: /api/users
+    method: POST
+    response:
+      status: 201
+      headers:
+        Content-Type: application/json
+      body:
+        id: "{{.RandomID}}"
+        message: "User created successfully"
+        timestamp: "{{.Timestamp}}"
+
+  - path: /api/users/:id
+    method: PUT
+    response:
+      status: 200
+      body:
+        id: "{{.PathParam.id}}"
+        message: "User updated successfully"
+
+  - path: /api/users/:id
+    method: DELETE
+    response:
+      status: 204
+      body: {}
+
+  - path: /api/search
+    method: GET
+    response:
+      status: 200
+      body:
+        query: "{{.QueryParam.q}}"
+        page: "{{.QueryParam.page}}"
+        results: []

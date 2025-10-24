@@ -1,0 +1,45 @@
+service:
+  name: error-service
+  version: v1.0.0
+  port: 8083
+
+observability:
+  health_check:
+    enabled: true
+    path: /health
+  logging:
+    level: debug
+    format: json
+
+endpoints:
+  - path: /api/flaky
+    method: GET
+    error_rate: 0.3
+    response:
+      status: 200
+      body:
+        message: "This endpoint fails 30% of the time"
+        service: "{{.Service.Name}}"
+
+  - path: /api/slow
+    method: GET
+    latency: 2s
+    response:
+      status: 200
+      body:
+        message: "This endpoint has 2s latency"
+        timestamp: "{{.Timestamp}}"
+
+  - path: /api/weighted-responses
+    method: GET
+    responses:
+      - status: 200
+        body:
+          result: success
+          message: "Returned 80% of the time"
+        weight: 80
+      - status: 503
+        body:
+          result: error
+          message: "Service unavailable - 20% of the time"
+        weight: 20
