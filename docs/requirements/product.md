@@ -70,6 +70,30 @@
 - 自定义业务指标监控
 - 基于监控数据的自动决策
 
+### 7. 流量控制与拓扑管理
+
+通过负载均衡器(LB)配置实现智能流量控制和服务拓扑可视化管理:
+
+**拓扑即配置**:
+- 服务调用关系完全由 LB 配置定义
+- 可视化拓扑图自动生成,支持图形化编辑
+- 配置变更自动同步到拓扑图
+
+**智能流量路由**:
+- 支持按百分比分配流量到不同版本
+- 基于路由规则实现多版本独立链路
+- 自动处理流量标签传递和路由匹配
+
+**多版本并行发布**:
+- 支持不兼容版本同时在线运行
+- 通过流量标签实现物理拓扑隔离
+- 灰度发布时可精确控制流量分配
+
+**图形化配置管理**:
+- 直观的拓扑编辑界面,避免手动修改配置文件
+- 支持拖拽式调整服务节点和流量权重
+- 配置验证和版本控制,支持一键回滚
+
 ## 使用场景
 
 ### 场景 1: 新版本灰度发布
@@ -100,6 +124,16 @@
 3. 在不同环境执行相同的发布流程
 4. 统一的监控和管理界面
 
+### 场景 4: 不兼容版本并行发布
+
+需要同时运行新旧两个不兼容版本,逐步迁移用户:
+
+1. 通过 LB 配置定义独立的流量路由规则
+2. 30% 流量自动打上路由标签,走新版本链路
+3. 70% 流量保持在旧版本链路
+4. 可视化拓扑图实时展示两条独立调用链
+5. 观察稳定后逐步调整流量比例至 100%
+
 ## 技术要求
 
 ### 基础设施
@@ -124,7 +158,9 @@
 ## 相关文档
 
 - 主需求 Issue: [#3 智能发布系统](https://github.com/LiusCraft/x-mindflow/issues/3)
-- 本需求 Issue: [#7 统一发布抽象层设计](https://github.com/LiusCraft/x-mindflow/issues/7)
+- 统一发布抽象层 Issue: [#7 统一发布抽象层设计](https://github.com/LiusCraft/x-mindflow/issues/7)
 - 环境适配层 Issue: [#8 环境适配层设计](https://github.com/LiusCraft/x-mindflow/issues/8)
+- LB 流量控制 Issue: [#9 LB 流量控制与拓扑管理](https://github.com/LiusCraft/x-mindflow/issues/9)
 - 技术实现文档: [7-deployment-abstraction-layer-technical.md](./7-deployment-abstraction-layer-technical.md)
 - 环境适配层详细设计: [8-environment-adapter-detail.md](./8-environment-adapter-detail.md)
+- LB 流量控制详细设计: [9-lb-traffic-control-technical.md](./9-lb-traffic-control-technical.md)
