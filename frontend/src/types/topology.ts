@@ -60,11 +60,22 @@ export interface TopologyEdge {
 }
 
 /**
+ * 服务组合（LB + 服务节点）
+ */
+export interface ServiceCombo {
+  id: string;
+  type: 'combo';
+  label: string;
+  branch?: string;
+}
+
+/**
  * 拓扑图数据
  */
 export interface TopologyData {
   nodes: Array<ServiceNode | LBNode>;
   edges: TopologyEdge[];
+  combos?: ServiceCombo[];
 }
 
 /**

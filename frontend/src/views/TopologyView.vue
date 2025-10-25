@@ -24,7 +24,7 @@ import TopologyGraph from '@/components/business/TopologyGraph.vue';
             </div>
             <div class="legend-item">
               <div class="legend-icon lb-icon-small"></div>
-              <span class="legend-text">LB 节点</span>
+              <span class="legend-text">服务的 LB 节点</span>
             </div>
             <div class="legend-item">
               <div class="legend-icon status-healthy"></div>
@@ -43,6 +43,7 @@ import TopologyGraph from '@/components/business/TopologyGraph.vue';
           <div class="usage-tips">
             <div class="tip-item">💡 支持缩放和平移操作</div>
             <div class="tip-item">💡 流量百分比实时计算</div>
+            <div class="tip-item">💡 点击节点/连线可复制文本</div>
           </div>
         </div>
       </div>
@@ -157,11 +158,13 @@ import TopologyGraph from '@/components/business/TopologyGraph.vue';
 }
 
 .lb-icon-small {
-  width: 10px;
-  height: 10px;
-  background-color: #3b82f6;
-  border: 2px solid #2563eb;
-  border-radius: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #4C9AFF;
+  border: 2px solid #2684FF;
+  /* 使用 clip-path 创建六边形 */
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border-radius: 0;
 }
 
 .status-healthy {
