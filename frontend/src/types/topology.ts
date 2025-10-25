@@ -11,6 +11,7 @@ export interface ServiceVersion {
   instanceCount: number;
   color: string;
   isTarget?: boolean;
+  status?: 'healthy' | 'warning' | 'error';
 }
 
 /**

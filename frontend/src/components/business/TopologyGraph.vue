@@ -2,7 +2,7 @@
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { Graph } from '@antv/g6';
 import { useTopologyStore } from '@/stores/topologyStore';
-import type { ServiceNode, LBNode } from '@/types/topology';
+import type { ServiceNode } from '@/types/topology';
 
 const topologyStore = useTopologyStore();
 
@@ -27,10 +27,20 @@ const branchColors = {
   },
 };
 
+const statusColors = {
+  healthy: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+};
+
 function getBranchColor(branch: string | undefined, type: 'node' | 'nodeStroke' | 'edge' = 'node'): string {
   const branchKey = branch || 'default';
   const colors = branchColors[branchKey as keyof typeof branchColors] || branchColors.default;
   return colors[type];
+}
+
+function getStatusColor(status?: string): string {
+  return statusColors[status as keyof typeof statusColors] || statusColors.healthy;
 }
 
 onMounted(() => {
@@ -43,8 +53,8 @@ onMounted(() => {
     layout: {
       type: 'dagre',
       rankdir: 'LR',
-      nodesep: 60,
-      ranksep: 180,
+      nodesep: 80,
+      ranksep: 200,
       align: 'UL',
       controlPoints: true,
     },
@@ -98,42 +108,70 @@ function renderGraph() {
 
   const { nodes, edges } = topologyStore.topologyData;
 
-  const serviceNodeSize = 180;
-  const lbNodeSize = serviceNodeSize / 4;
+  const serviceNodeSize = 90;
+  const lbNodeSize = 60;
 
   const g6Nodes = nodes.map((node) => {
     const isService = node.type === 'service';
     const serviceNode = node as ServiceNode;
-    const lbNode = node as LBNode;
     const branch = node.branch || 'default';
 
-    const nodeFill = isService ? '#ffffff' : getBranchColor(branch, 'node');
-    const nodeStroke = getBranchColor(branch, 'nodeStroke');
+    if (isService) {
+      const versions = serviceNode.versions || [];
+      const primaryStatus = versions[0]?.status || 'healthy';
+      const primaryColor = getStatusColor(primaryStatus);
 
-    return {
-      id: node.id,
-      data: {
-        ...node,
-        label: isService
-          ? `${serviceNode.name}\n${serviceNode.totalTrafficPercentage}% 流量\n${serviceNode.totalInstances} 实例`
-          : `LB\n${lbNode.rules.length} 规则`,
-        cluster: isService ? 'service' : 'lb',
-        branch,
-      },
-      style: {
-        fill: nodeFill,
-        stroke: nodeStroke,
-        lineWidth: isService ? 2 : 3,
-        lineDash: isService ? [] : [5, 5],
-        radius: isService ? 8 : 4,
-        size: isService ? serviceNodeSize : lbNodeSize,
-        labelText: isService
-          ? `${serviceNode.name}\n${serviceNode.totalTrafficPercentage}% 流量\n${serviceNode.totalInstances} 实例`
-          : `LB\n${lbNode.rules.length} 规则`,
-        labelFontSize: isService ? 12 : 10,
-        labelFill: isService ? '#1e293b' : '#ffffff',
-      },
-    };
+      return {
+        id: node.id,
+        data: {
+          ...node,
+          label: `${serviceNode.name}\n${serviceNode.totalTrafficPercentage}%`,
+          cluster: 'service',
+          branch,
+          versions,
+        },
+        style: {
+          size: serviceNodeSize,
+          fill: primaryColor,
+          stroke: getBranchColor(branch, 'nodeStroke'),
+          lineWidth: 3,
+          labelText: `${serviceNode.name}\n${serviceNode.totalTrafficPercentage}%`,
+          labelFontSize: 11,
+          labelFill: '#1e293b',
+          labelFontWeight: 600,
+          shadowColor: 'rgba(0, 0, 0, 0.2)',
+          shadowBlur: 8,
+          shadowOffsetX: 2,
+          shadowOffsetY: 2,
+        },
+      };
+    } else {
+      return {
+        id: node.id,
+        data: {
+          ...node,
+          label: `LB`,
+          cluster: 'lb',
+          branch,
+        },
+        style: {
+          size: lbNodeSize,
+          fill: getBranchColor(branch, 'node'),
+          stroke: getBranchColor(branch, 'nodeStroke'),
+          lineWidth: 2,
+          lineDash: [5, 5],
+          radius: 6,
+          labelText: `LB`,
+          labelFontSize: 10,
+          labelFill: '#ffffff',
+          labelFontWeight: 600,
+          shadowColor: 'rgba(0, 0, 0, 0.15)',
+          shadowBlur: 6,
+          shadowOffsetX: 1,
+          shadowOffsetY: 1,
+        },
+      };
+    }
   });
 
   const g6Edges = edges.map((edge) => {
@@ -152,8 +190,11 @@ function renderGraph() {
       style: {
         labelText: edge.label || `${edge.trafficPercentage}%`,
         stroke: edgeColor,
-        lineWidth: 2,
+        lineWidth: 2.5,
         endArrow: true,
+        lineDash: [10, 5],
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        shadowBlur: 4,
       },
     };
   });
@@ -185,7 +226,7 @@ function handleResize() {
   width: 100%;
   height: 100%;
   position: relative;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 8px;
   overflow: hidden;
 }
